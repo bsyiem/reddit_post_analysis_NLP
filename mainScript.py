@@ -49,7 +49,8 @@ def getPostEntities(filename):
 
 def main(argv):
 
-    filename = "data/results-2019-titleandbodyonly-utf8.csv"
+    # filename = "data/results-2019-titleandbodyonly-utf8.csv"
+    filename = "data/results-2019-titleandbodyonly-utf8-excel.csv"
     posts = getPostEntities(filename)
 
     for id in posts:
