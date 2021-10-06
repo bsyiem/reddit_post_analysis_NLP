@@ -8,6 +8,7 @@
 # semantic search: https://www.sbert.net/examples/applications/semantic-search/README.html
 
 import sys
+import os.path
 sys.path.append("..")
 
 import pandas as pd
@@ -22,7 +23,7 @@ pretrained_bert_model_name = 'all-mpnet-base-v2'
 textProcessor = TextProcessor(pretrained_bert_model_name)
 
 def getPostEntities(filename):
-    id = 1
+    p_id = 1
 
     # with open(filename, mode = 'r', encoding = 'utf-8') as file:
     #     df = pd.read_excel(file, header = 0) # default sheet index = 0
@@ -33,7 +34,7 @@ def getPostEntities(filename):
     posts = dict()
     for index, row in df.iterrows():
         post = Post()
-        post.id = id
+        post.id = p_id
         post.title = str(row['title'])
         post.content = str(row['selftext'])
         print(post.title)
@@ -41,7 +42,7 @@ def getPostEntities(filename):
         post.title_embedding = textProcessor.getSentenceEmbedding(" ") if post.title == None else textProcessor.getSentenceEmbedding(post.title)
         post.content_embedding = textProcessor.getSentenceEmbedding(" ") if post.content == None else textProcessor.getSentenceEmbedding(post.content)
         posts[post.id] = post
-        id += 1
+        p_id += 1
 
     return posts
 
@@ -50,11 +51,20 @@ def getPostEntities(filename):
 def main(argv):
 
     # filename = "data/results-2019-titleandbodyonly-utf8.csv"
-    filename = "data/results-2019-titleandbodyonly-utf8-excel.csv"
-    posts = getPostEntities(filename)
+    data_filename = "data/results-2019-titleandbodyonly-utf8-excel.csv"
+    bert_embedding_filename = "bert_output.csv"
 
-    for id in posts:
-        print(posts[id].title.encode("utf-8"))
+    if(not os.path.exists(bert_embedding_filename)):
+        posts = getPostEntities(data_filename)
+        # fields = ['id', 'title', 'title_embedding', 'content_embedding']
+        reddit_bert_df = pd.DataFrame([posts[id].to_dict() for id in posts])
+        reddit_bert_df.to_csv(bert_embedding_filename)
+
+    reddit_bert_df = pd.read_csv(bert_embedding_filename)
+    print(reddit_bert_df)
+
+    # for p_id in posts:
+    #     print(posts[p_id].title.encode("utf-8"))
 
 
 
