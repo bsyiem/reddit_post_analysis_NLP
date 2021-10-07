@@ -44,11 +44,9 @@ class RedditAnalysis(object):
             output_path_content = "output/content/"+row['theme']+".csv"
             output_path_title = "output/title/"+row['theme']+".csv"
 
-            # The index starts from 0 so the actual row is +1
+            # The index starts from 0 so the actual row is +1 (as we have to account for header)
             content_top_cos_df.to_csv(output_path_content)
             title_top_cos_df.to_csv(output_path_title)
-
-
 
             # print(content_top_cos)
             # print(content_top_ang)
