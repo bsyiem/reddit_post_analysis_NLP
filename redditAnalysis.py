@@ -34,19 +34,24 @@ class RedditAnalysis(object):
             title_top_cos =  torch.topk(title_cos_scores, k = top_k)
             title_top_ang =  torch.topk(title_ang_scores, k = top_k)
 
-            # content_top_cos_df = pd.DataFrame(content_top_cos)
-            # title_top_cos_df = pd.DataFrame(title_top_cos)
-            #
-            # output_path_content = "output/content/"+self.theme_embedding_df['theme']+".csv"
-            # output_path_title = "output/title/"+self.theme_embedding_df['theme']+".csv"
-            #
-            # content_top_cos_df.to_csv(output_path_content)
-            # title_top_cos_df.to_csv(output_path_title)
 
+            temp_dict = {"score": content_top_cos[0].numpy(), "index": content_top_cos[1].numpy()}
+            content_top_cos_df = pd.DataFrame(temp_dict)
+
+            temp_dict = {"score": title_top_cos[0].numpy(), "index": title_top_cos[1].numpy()}
+            title_top_cos_df = pd.DataFrame(temp_dict)
+
+            output_path_content = "output/content/"+row['theme']+".csv"
+            output_path_title = "output/title/"+row['theme']+".csv"
 
             # The index starts from 0 so the actual row is +1
-            print(content_top_cos)
-            print(content_top_ang)
+            content_top_cos_df.to_csv(output_path_content)
+            title_top_cos_df.to_csv(output_path_title)
 
-            print(title_top_cos)
-            print(title_top_ang)
+
+
+            # print(content_top_cos)
+            # print(content_top_ang)
+            #
+            # print(title_top_cos)
+            # print(title_top_ang)
