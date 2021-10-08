@@ -4,6 +4,8 @@ from textProcessor import TextProcessor
 import numpy as np
 import pandas as pd
 
+# Has a known issue where empty strings are also considered similar - not sure how to fix.
+# best is to ignore a suggestion with an empty string or NaN
 class RedditAnalysis(object):
 
     def __init__(self, textProcessor, data_embedding_df, theme_embedding_df):

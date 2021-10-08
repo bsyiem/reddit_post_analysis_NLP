@@ -33,7 +33,7 @@ def getPostEntities(filename):
     p_id = 1
 
     with open(filename, mode = 'r', encoding = 'utf-8') as file:
-        df = pd.read_csv(file, header = 0)
+        df = pd.read_csv(file, header = 0, keep_default_na = False)
 
     posts = dict()
     for index, row in df.iterrows():
@@ -42,8 +42,10 @@ def getPostEntities(filename):
         post.title = str(row['title'])
         post.content = str(row['selftext'])
         print(post.title)
-        post.title_embedding = textProcessor.getSentenceEmbedding(" ") if post.title == None else textProcessor.getSentenceEmbedding(post.title)
-        post.content_embedding = textProcessor.getSentenceEmbedding(" ") if post.content == None else textProcessor.getSentenceEmbedding(post.content)
+        # post.title_embedding = textProcessor.getSentenceEmbedding("") if post.title == None else textProcessor.getSentenceEmbedding(post.title)
+        # post.content_embedding = textProcessor.getSentenceEmbedding("") if post.content == None else textProcessor.getSentenceEmbedding(post.content)
+        post.title_embedding = textProcessor.getSentenceEmbedding(post.title)
+        post.content_embedding = textProcessor.getSentenceEmbedding(post.content)
         post.title_number_chars = len(post.title)
         post.content_number_chars = len(post.content)
         posts[post.id] = post
@@ -65,7 +67,7 @@ def main(argv):
 
     ### loading main dataset
     data_filepath = "data/results-2019-titleandbodyonly-utf8-excel.csv"
-    bert_embedding_filepath = "data/bert_output.csv"
+    bert_embedding_filepath = "generated/bert_output.csv"
 
     if(not os.path.exists(bert_embedding_filepath)):
         posts = getPostEntities(data_filepath)
@@ -73,7 +75,7 @@ def main(argv):
         reddit_bert_df = pd.DataFrame([posts[id].to_dict() for id in posts])
         reddit_bert_df.to_csv(bert_embedding_filepath)
 
-    reddit_bert_df = pd.read_csv(bert_embedding_filepath) #read csv reads the ndarray as a string
+    reddit_bert_df = pd.read_csv(bert_embedding_filepath, keep_default_na = False) #read csv reads the ndarray as a string
 
 
     # this is fucked - may as well just re-encode everything
@@ -87,15 +89,15 @@ def main(argv):
 
     ### loading themes to perform sentiment analysis
     theme_filepath = "data/investigation-themes.csv"
-    theme_embedding_filepath = "data/theme_embedding.csv"
+    theme_embedding_filepath = "generated/theme_embedding.csv"
 
     if(not os.path.exists(theme_embedding_filepath)):
         with open(theme_filepath, mode = 'r', encoding = 'utf-8') as file:
-            theme_df = pd.read_csv(file, header = 0)
-            theme_df['theme_embedding'] = np.ndarray(list(map(textProcessor.getSentenceEmbedding, theme_df['theme'])))
+            theme_df = pd.read_csv(file, header = 0, keep_default_na = False)
+            theme_df['theme_embedding'] = list(map(textProcessor.getSentenceEmbedding, theme_df['theme']))
             theme_df.to_csv(theme_embedding_filepath)
 
-    theme_df = pd.read_csv(theme_embedding_filepath) #read csv reads the ndarray as a string
+    theme_df = pd.read_csv(theme_embedding_filepath, keep_default_na = False) #read csv reads the ndarray as a string
 
 
     # this is fucked - may as well just re-encode everything
@@ -103,7 +105,6 @@ def main(argv):
 
     theme_df['theme_embedding'] = np.array(theme_df['theme_embedding'])
 
-    print(argv[0])
     # run some analysis
     redditAnalysis = RedditAnalysis(textProcessor, reddit_bert_df, theme_df)
     redditAnalysis.semanticSearchK(int(argv[0]))
