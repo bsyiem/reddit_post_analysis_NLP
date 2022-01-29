@@ -88,7 +88,7 @@ def main(argv):
 
 
     ### loading themes to perform sentiment analysis
-    theme_filepath = "data/investigation-themes.csv"
+    theme_filepath = "data/investigation-themes-with-additional.csv"
     theme_embedding_filepath = "generated/theme_embedding.csv"
 
     if(not os.path.exists(theme_embedding_filepath)):
